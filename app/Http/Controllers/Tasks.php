@@ -13,21 +13,31 @@ class Tasks extends Controller
 
     public function createTask(Request $request, $workspaceid)
     {
+    $request->validate([
+    "name"=>"required",
+    "description"=>"required",
+    "importance"=>"required",
+    "due_date"=>"required|date"
+    ]);
+    $user_id = Auth::id();
+    $usern = Auth::user();
+    $u = $usern->name;
 
-        $request->validate([
-            "name"=>"required",
-            "description"=>"required",
-            "importance"=>"required"
-        ]);
+    $taskname = $request->input("name");
+    $taskdescr = $request->input("description");
+    $due_date = $request->input("due_date");
+    $taskimp = $request->input("importance");
 
-        $user_id = Auth::id();
-        $usern = Auth::user();
-        $u = $usern->name;
+    // Create task in Todoist
+    $todoist = new TodoistClient(env('4d47e8030482f03f5a887c7e362b0e41574fc3f1'));
+    $response = $todoist->createTask([
+        'content' => $taskname,
+        'description' => $taskdescr,
+        'due_date_utc' => date('Y-m-d\TH:i:s', strtotime($due_date))
+    ]);
 
-        $taskname = $request->input("name");
-        $taskdescr = $request->input("description");
-        $taskimp = $request->input("importance");
-
+    // Check if Todoist task creation was successful
+    if (isset($response['id'])) {
         $task = new Task();
 
         $task->name = $taskname;
@@ -35,15 +45,19 @@ class Tasks extends Controller
         $task->importance = $taskimp;
         $task->creator = $u;
         $task->status = "Non Fait";
+        $task->due_date = $due_date; // Save due date to database
+        $task->todoist_id = $response['id']; // Save Todoist task ID to database
 
         $task->save();
 
-        $workspace = Workspace::find($workspaceid);
+        $workspace = Workspace::find($user_id);
         $workspace->tasks()->attach($workspaceid, ['task_id' => $task->id, 'user_id' => $user_id]);
 
-        return back();
-
+        return back()->with('success', 'Tâche créée avec succès.');
+    } else {
+        return back()->with('error', 'Impossible de créer la tâche. Veuillez réessayer plus tard.');
     }
+}
 
     public function deleteTask($id) 
     {

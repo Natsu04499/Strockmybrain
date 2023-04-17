@@ -13,22 +13,21 @@ class Tasks extends Controller
 {
 
     public function createTask(Request $request, $workspaceid)
-{
+    {
     $request->validate([
-        "name"=>"required",
-        "description"=>"required",
-        "importance"=>"required",
-        "due_date"=>"required|date"
+    "name"=>"required",
+    "description"=>"required",
+    "importance"=>"required",
+    "due_date"=>"required|date"
     ]);
-
     $user_id = Auth::id();
     $usern = Auth::user();
     $u = $usern->name;
 
     $taskname = $request->input("name");
     $taskdescr = $request->input("description");
-    $taskimp = $request->input("importance");
     $due_date = $request->input("due_date");
+    $taskimp = $request->input("importance");
 
     // Create task in Todoist
     $todoist = new TodoistClient(env('4d47e8030482f03f5a887c7e362b0e41574fc3f1'));
@@ -47,6 +46,7 @@ class Tasks extends Controller
         $task->importance = $taskimp;
         $task->creator = $u;
         $task->status = "Non Fait";
+        $task->due_date = $due_date; // Save due date to database
         $task->todoist_id = $response['id']; // Save Todoist task ID to database
 
         $task->save();
@@ -59,6 +59,7 @@ class Tasks extends Controller
         return back()->with('error', 'Impossible de créer la tâche. Veuillez réessayer plus tard.');
     }
 }
+
 
 
     public function deleteTask($id) 

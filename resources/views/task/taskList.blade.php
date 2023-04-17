@@ -4,10 +4,9 @@
 <form method="POST" action="/createtask/{{ $workspace->id }}">
     @csrf
     <input type="text" name="name" placeholder="Nom de la tâche">
-
     <input type="text" name="description" placeholder="Déscription de la tâche" size="20" maxlength="30">
 
-    {{-- <input type="date" name="date" placeholder="Date de création"> --}}
+    <input type="date" name="due_date" placeholder="Date limite">
 
     <select name="importance">
         <option selected disabled>--Choisissez l'importance de la tâche'--</option>
@@ -19,17 +18,20 @@
     </select>
 
     <input type="submit" name='sub' value="Enregistrer">
-</form>
 
-@foreach ($workspace->tasks as $task)
-    <br>
-    <div>
+        </form>
+        @foreach ($workspace->tasks as $task)
+        <br>
+        <div>
         <b>Nom de la tache :</b> {{$task->name}} <br>
         <b>Description :</b> {{$task->description}} <br>
         <b>Importance :</b> {{$task->importance}} <br>
         <b>Créateur :</b> {{$task->creator}} <br>
         <b>Date :</b> {{$task->created_at}} <br>
-        <b>Etat :</b> {{$task->status}}
+        <b>Date limite :</b> {{$task->due_date}} <br>
+        <b>Etat :</b> {{$task->status}} <br>
+        </div>
+
 
         @foreach ($connectedUser->workspaces as $u)
             {{-- Si l'utilisateur est propriétaire du tableau, il aura une option en plus dans le menu déroulant --}}

@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('creator');
             $table->string('status');
             $table->timestamps();
+            $table->date('due_date')->nullable();
+            $table->integer('todoist_id');
         });
     }
 
