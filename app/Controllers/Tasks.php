@@ -13,22 +13,33 @@ class Tasks extends Controller
 {
 
     public function createTask(Request $request, $workspaceid)
-    {
+{
+    $request->validate([
+        "name"=>"required",
+        "description"=>"required",
+        "importance"=>"required",
+        "due_date"=>"required|date"
+    ]);
 
-        $request->validate([
-            "name"=>"required",
-            "description"=>"required",
-            "importance"=>"required"
-        ]);
+    $user_id = Auth::id();
+    $usern = Auth::user();
+    $u = $usern->name;
 
-        $user_id = Auth::id();
-        $usern = Auth::user();
-        $u = $usern->name;
+    $taskname = $request->input("name");
+    $taskdescr = $request->input("description");
+    $taskimp = $request->input("importance");
+    $due_date = $request->input("due_date");
 
-        $taskname = $request->input("name");
-        $taskdescr = $request->input("description");
-        $taskimp = $request->input("importance");
+    // Create task in Todoist
+    $todoist = new TodoistClient(env('4d47e8030482f03f5a887c7e362b0e41574fc3f1'));
+    $response = $todoist->createTask([
+        'content' => $taskname,
+        'description' => $taskdescr,
+        'due_date_utc' => date('Y-m-d\TH:i:s', strtotime($due_date))
+    ]);
 
+    // Check if Todoist task creation was successful
+    if (isset($response['id'])) {
         $task = new Task();
 
         $task->name = $taskname;
@@ -36,15 +47,19 @@ class Tasks extends Controller
         $task->importance = $taskimp;
         $task->creator = $u;
         $task->status = "Non Fait";
+        $task->todoist_id = $response['id']; // Save Todoist task ID to database
 
         $task->save();
 
         $workspace = Workspace::find($user_id);
         $workspace->tasks()->attach($workspaceid, ['task_id' => $task->id, 'user_id' => $user_id]);
 
-        return back();
-
+        return back()->with('success', 'Tâche créée avec succès.');
+    } else {
+        return back()->with('error', 'Impossible de créer la tâche. Veuillez réessayer plus tard.');
     }
+}
+
 
     public function deleteTask($id) 
     {
