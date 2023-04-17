@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Task;
 use App\Models\User;
+use App\Services\TodoistClient;
 use App\Models\Workspace;
 
 class Tasks extends Controller
@@ -30,11 +31,13 @@ class Tasks extends Controller
 
     // Create task in Todoist
     $todoist = new TodoistClient(env('4d47e8030482f03f5a887c7e362b0e41574fc3f1'));
-    $response = $todoist->createTask([
+    $project_id = 2311491412; // remplacez par l'ID de votre projet Todoist
+    $response = $todoist->createTask($project_id, [
         'content' => $taskname,
         'description' => $taskdescr,
         'due_date_utc' => date('Y-m-d\TH:i:s', strtotime($due_date))
     ]);
+
 
     // Check if Todoist task creation was successful
     if (isset($response['id'])) {
