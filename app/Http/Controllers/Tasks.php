@@ -13,12 +13,12 @@ class Tasks extends Controller
 {
 
     public function createTask(Request $request, $workspaceid)
-    {
+{
     $request->validate([
-    "name"=>"required",
-    "description"=>"required",
-    "importance"=>"required",
-    "due_date"=>"required|date"
+        "name"=>"required",
+        "description"=>"required",
+        "importance"=>"required",
+        "due_date"=>"required|date"
     ]);
     $user_id = Auth::id();
     $usern = Auth::user();
@@ -29,38 +29,36 @@ class Tasks extends Controller
     $due_date = $request->input("due_date");
     $taskimp = $request->input("importance");
 
-    // Create task in Todoist
-    $todoist = new TodoistClient(env('4d47e8030482f03f5a887c7e362b0e41574fc3f1'));
-    $project_id = 2311491412; // remplacez par l'ID de votre projet Todoist
-    $response = $todoist->createTask($project_id, [
+    $task = [
         'content' => $taskname,
+        'project_id' => config('todoist.project_id'),
         'description' => $taskdescr,
         'due_date_utc' => date('Y-m-d\TH:i:s', strtotime($due_date))
-    ]);
+    ];
 
+    $todoist = new TodoistClient(config('todoist.api_key'));
+    $response = $todoist->createTask(config('todoist.project_id'), $task);
 
-    // Check if Todoist task creation was successful
     if (isset($response['id'])) {
-        $task = new Task();
-
-        $task->name = $taskname;
-        $task->description = $taskdescr;
-        $task->importance = $taskimp;
-        $task->creator = $u;
-        $task->status = "Non Fait";
-        $task->due_date = $due_date; // Save due date to database
-        $task->todoist_id = $response['id']; // Save Todoist task ID to database
-
-        $task->save();
+        $new_task = new Task();
+        $new_task->name = $taskname;
+        $new_task->description = $taskdescr;
+        $new_task->importance = $taskimp;
+        $new_task->creator = $u;
+        $new_task->status = "Non Fait";
+        $new_task->due_date = $due_date;
+        $new_task->todoist_id = $response['id'];
+        $new_task->save();
 
         $workspace = Workspace::find($user_id);
-        $workspace->tasks()->attach($workspaceid, ['task_id' => $task->id, 'user_id' => $user_id]);
+        $workspace->tasks()->attach($workspaceid, ['task_id' => $new_task->id, 'user_id' => $user_id]);
 
         return back()->with('success', 'Tâche créée avec succès.');
     } else {
         return back()->with('error', 'Impossible de créer la tâche. Veuillez réessayer plus tard.');
     }
 }
+
 
     public function deleteTask($id) 
     {

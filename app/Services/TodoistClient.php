@@ -9,29 +9,26 @@ class TodoistClient
     private $client;
     private $api_key;
 
-    public function __construct()
+    public function __construct($api_key)
     {
         $this->client = new Client([
-            'base_uri' => config('todoist.base_uri')
+            'base_uri' => 'https://api.todoist.com/rest/v1/'
         ]);
-        $this->api_key = config('todoist.api_key');
+        $this->api_key = $api_key;
     }
 
-    public function createTask($content, $project_id, $due_date_utc = null)
+
+    public function createTask($project_id, $task)
     {
         $params = [
-            'json' => [
-                'content' => $content,
-                'project_id' => $project_id,
-                'due_date_utc' => $due_date_utc
-            ],
+            'json' => $task,
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->api_key
             ]
         ];
 
-        $response = $this->client->post('tasks', $params);
+        $response = $this->client->post("tasks", $params);
 
-        return json_decode($response->getBody());
+        return json_decode($response->getBody(), true);
     }
 }
