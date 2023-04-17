@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\TodoistClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Task;
