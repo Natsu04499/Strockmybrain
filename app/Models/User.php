@@ -41,4 +41,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function workspaces()
+    {
+        return $this->belongsToMany(Workspace::class, 'user_workspace')->withPivot('ownership', 'admin')->withTimestamps();
+    }
+
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_workspace')->withTimestamps();
+    }
 }
