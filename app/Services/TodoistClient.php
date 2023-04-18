@@ -11,24 +11,30 @@ class TodoistClient
 
     public function __construct($api_key)
     {
-        $this->client = new Client([
-            'base_uri' => 'https://api.todoist.com/rest/v1/'
-        ]);
         $this->api_key = $api_key;
+
+        $this->client = new \GuzzleHttp\Client([
+            'base_uri' => 'https://api.todoist.com/rest/v2/tasks',
+            'verify' => false // désactiver la vérification SSL pour le moment
+        ]);
     }
 
-
-    public function createTask($project_id, $task)
+    public function createTask($content, $project_id, $due_date_utc = null)
     {
         $params = [
-            'json' => $task,
+            'json' => [
+                'content' => $content,
+                'project_id' => $project_id,
+                'due_date_utc' => $due_date_utc
+            ],
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->api_key
             ]
         ];
 
-        $response = $this->client->post("tasks", $params);
+        $response = $this->client->post('tasks', $params);
 
-        return json_decode($response->getBody(), true);
+        return json_decode($response->getBody());
     }
 }
+
