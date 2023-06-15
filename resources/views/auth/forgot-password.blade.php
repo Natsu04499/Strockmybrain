@@ -3,7 +3,7 @@
     {{ session('status') }}
 @endif
 
-<form method="POST" action="/forgot-password">
+<form method="POST" action="/echrif.rayan/forgot-password">
     @csrf
     Email: <input type="text" name="email"><br>
     <button type="submit">Poursuivre</button>

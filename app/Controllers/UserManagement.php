@@ -48,36 +48,76 @@ class UserManagement extends Controller
         
     }
 
-    public function removeUserFromWorkspace($id, $listeduserid)
-    {
+    // public function removeUserFromWorkspace($id, $listeduserid)
+    // {
 
         
-        $workspace = Workspace::find($id);
+    //     $workspace = Workspace::find($id);
+
+    //     $user_id = Auth::id();
+
+    //     $user1 = User::find($user_id);
+    //     $user2 = User::find($listeduserid);
+
+    //     foreach($user1->workspaces as $u1) {
+    //         foreach($user2->workspaces as $u2) {
+    //             if($u1->pivot->ownership == 1 && $u2->pivot->ownership == 0 
+    //             || $u1->pivot->isAdmin == 1 && $u2->pivot->isAdmin == 0) {
+
+    //                 $workspace->users()->detach($listeduserid);
+    //                 return back();
+                    
+    //             } else {
+                    
+    //                 return redirect()->back()->with('alert','Vous ne pouvez pas faire cette action : "Raison: Vous navez pas les permissions nécessaires !"');
+    //             }
+    //         }
+    //     }
+    // }
+
+    public function removeUserFromWorkspace($workspaceid, $listeduserid)
+    {
+        $workspace = Workspace::find($workspaceid);
 
         $user_id = Auth::id();
 
         $user1 = User::find($user_id);
         $user2 = User::find($listeduserid);
 
-        foreach($user1->workspaces as $u1) {
-            foreach($user2->workspaces as $u2) {
-                if($u1->pivot->ownership == 1 && $u2->pivot->ownership == 0 
-                || $u1->pivot->isAdmin == 1 && $u2->pivot->isAdmin == 0) {
+        $workspace->users()->detach($listeduserid);
 
-                    $workspace->users()->detach($listeduserid);
-                    return back();
-                    
-                } else {
-                    
-                    return redirect()->back()->with('alert','Vous ne pouvez pas faire cette action : "Raison: Vous navez pas les permissions nécessaires !"');
-                }
-            }
-        }
+        return redirect()->back();
     }
+
+    // public function transferOwnership($id, $listeduserid)
+    // {
+
+    //     $workspace = Workspace::find($id);
+
+    //     $user_id = Auth::id();
+
+    //     $user1 = User::find($user_id);
+    //     $user2 = User::find($listeduserid);
+
+    //     foreach($user1->workspaces as $u1) {
+    //         foreach($user2->workspaces as $u2) {
+    //             if($u1->pivot->ownership == 1 && $u2->pivot->ownership == 0) {
+
+    //                 $user1->workspaces()->updateExistingPivot($id, ['ownership' => 0]);
+    //                 $user2->workspaces()->updateExistingPivot($id, ['ownership' => 1]);
+
+    //                 return back();
+
+    //             } else {
+
+    //                 return redirect()->back()->with('alert','Vous ne pouvez pas faire cette action : "Raison: Vous navez pas les permissions nécessaires !"');
+    //             }
+    //         }
+    //     }
+    // }
 
     public function transferOwnership($id, $listeduserid)
     {
-
         $workspace = Workspace::find($id);
 
         $user_id = Auth::id();
@@ -85,22 +125,64 @@ class UserManagement extends Controller
         $user1 = User::find($user_id);
         $user2 = User::find($listeduserid);
 
-        foreach($user1->workspaces as $u1) {
-            foreach($user2->workspaces as $u2) {
-                if($u1->pivot->ownership == 1 && $u2->pivot->ownership == 0) {
+        $user1->workspaces()->updateExistingPivot($id, ['ownership' => 0]);
+        $user2->workspaces()->updateExistingPivot($id, ['ownership' => 1]);
 
-                    $user1->workspaces()->updateExistingPivot($id, ['ownership' => 0]);
-                    $user2->workspaces()->updateExistingPivot($id, ['ownership' => 1]);
-
-                    return back();
-
-                } else {
-
-                    return redirect()->back()->with('alert','Vous ne pouvez pas faire cette action : "Raison: Vous navez pas les permissions nécessaires !"');
-                }
-            }
-        }
+        return redirect()->back();
     }
+
+    // public function changeRole(Request $request, $id, $listeduserid)
+    // {
+    //     $user_id = Auth::id();
+
+    //     $request->validate([
+    //         "userrole"=>"required"
+    //     ]);
+
+    //     $importance = $request->input("userrole");
+
+    //     $user1 = User::find($user_id);
+    //     $user2 = User::find($listeduserid);
+
+    //     if($importance == "Administrateur") {
+
+    //         foreach($user1->workspaces as $u1) {
+    //             foreach($user2->workspaces as $u2) {
+    //                 if($u1->pivot->ownership == 1 && $u2->pivot->ownership == 0) {
+    
+    //                     $user2->workspaces()->updateExistingPivot($id, ['admin' => 1]);
+    
+    //                     return back();
+    
+    //                 } else {
+    
+    //                     return redirect()->back()->with('alert','Vous ne pouvez pas faire cette action : "Raison: Vous navez pas les permissions nécessaires !"');
+    //                 }
+    //             }
+    //         }
+
+    //     } elseif ($importance == "Collaborateur") {
+
+    //         foreach($user1->workspaces as $u1) {
+    //             foreach($user2->workspaces as $u2) {
+    //                 if($u1->pivot->ownership == 1 && $u2->pivot->ownership == 0) {
+    
+    //                     $user2->workspaces()->updateExistingPivot($id, ['ownership' => 0, 'admin' => 0]);
+    
+    //                     return back();
+    
+    //                 } else {
+    
+    //                     return redirect()->back()->with('alert','Vous ne pouvez pas faire cette action : "Raison: Vous navez pas les permissions nécessaires !"');
+    //                 }
+    //             }
+    //         }
+
+    //     } else {
+
+    //         echo "ERROR";
+    //     }
+    // }
 
     public function changeRole(Request $request, $id, $listeduserid)
     {
@@ -110,48 +192,26 @@ class UserManagement extends Controller
             "userrole"=>"required"
         ]);
 
-        $importance = $request->input("userrole");
+        $role = $request->input("userrole");
 
         $user1 = User::find($user_id);
         $user2 = User::find($listeduserid);
 
-        if($importance == "Administrateur") {
+        if($role == "admin") {
+   
+            $user2->workspaces()->updateExistingPivot($id, ['admin' => 1]);
+    
+            return redirect()->back();
 
-            foreach($user1->workspaces as $u1) {
-                foreach($user2->workspaces as $u2) {
-                    if($u1->pivot->ownership == 1 && $u2->pivot->ownership == 0) {
-    
-                        $user2->workspaces()->updateExistingPivot($id, ['admin' => 1]);
-    
-                        return back();
-    
-                    } else {
-    
-                        return redirect()->back()->with('alert','Vous ne pouvez pas faire cette action : "Raison: Vous navez pas les permissions nécessaires !"');
-                    }
-                }
-            }
+        } elseif ($role == "contributor") {
 
-        } elseif ($importance == "Collaborateur") {
-
-            foreach($user1->workspaces as $u1) {
-                foreach($user2->workspaces as $u2) {
-                    if($u1->pivot->ownership == 1 && $u2->pivot->ownership == 0) {
+            $user2->workspaces()->updateExistingPivot($id, ['ownership' => 0, 'admin' => 0]);
     
-                        $user2->workspaces()->updateExistingPivot($id, ['ownership' => 0, 'admin' => 0]);
-    
-                        return back();
-    
-                    } else {
-    
-                        return redirect()->back()->with('alert','Vous ne pouvez pas faire cette action : "Raison: Vous navez pas les permissions nécessaires !"');
-                    }
-                }
-            }
+            return redirect()->back();
 
         } else {
 
-            echo "ERROR";
+            return;
         }
     }
 }

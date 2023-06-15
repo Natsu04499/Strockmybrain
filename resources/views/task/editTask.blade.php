@@ -3,7 +3,7 @@
 
 <h1>Modification de la Tâche</h1>
 
-    <form action="/edittask/{{$task["id"]}}" method="post">
+    <form action="/echrif.rayan/edittask/{{$task["id"]}}" method="post">
         @csrf
 
         <input type="text" name="name" placeholder="Nom de la tâche" value="{{ $task->name }}">

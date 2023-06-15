@@ -1,7 +1,7 @@
 @extends('components.layout')
 @section('content')
 
-<form method="POST" action="{{ route('user-profile-information.update') }}">
+<form method="POST" action="/echrif.rayan/{{ route('user-profile-information.update') }}">
     @csrf
     @method('PUT')
 
@@ -26,7 +26,7 @@
 
 <hr>
 
-<form method="POST" action="{{ route('user-password.update') }}">
+<form method="POST" action="/echrif.rayan/{{ route('user-password.update') }}">
     @csrf
     @method('PUT')
 

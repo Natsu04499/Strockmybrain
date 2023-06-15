@@ -171,7 +171,7 @@ background: #004e92;
          <div class="title">
             Connexion
          </div>
-         <form action="/login" method="POST">
+         <form action="/echrif.rayan/login" method="POST">
             @csrf
             <div class="field">
                <input type="text" name="email" required>

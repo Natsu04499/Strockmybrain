@@ -1,7 +1,7 @@
 
 <h1>Réinitialiser le mot de passe</h1>
 
-<form method="POST" action="/reset-password">
+<form method="POST" action="/echrif.rayan/reset-password">
     @csrf
     <input type="hidden" name="token" value="{{ request()->route('token') }}">
     Email: <input type="email" name="email"><br>
